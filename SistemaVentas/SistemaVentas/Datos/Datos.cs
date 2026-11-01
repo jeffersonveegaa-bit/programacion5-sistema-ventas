@@ -5,7 +5,7 @@ using MySql.Data.MySqlClient;
 
 namespace Datos
 {
-    /// <summary>Provee conexiones a MySQL.</summary>
+    /// <summary>Provee las  conexiones a MySQL.</summary>
     public static class Conexion
     {
         private const string Cadena = "Server=localhost;Database=ventasdb;Uid=root;Pwd=root;";
