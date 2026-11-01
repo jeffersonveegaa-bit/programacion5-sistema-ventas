@@ -52,7 +52,7 @@ namespace Datos
         }
     }
 
-    /// <summary>DAO de clientes.</summary>
+    /// <summary>DAO de los clientes.</summary>
     public class ClienteDAO : IRepositorio<Cliente, int>
     {
         public List<Cliente> ObtenerTodos()
