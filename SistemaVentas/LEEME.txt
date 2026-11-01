@@ -1,0 +1,7 @@
+CÓMO ABRIR Y PRESENTAR (WinForms)
+1. Ejecute database.sql en MySQL Workbench.
+2. Abra SistemaVentas.sln con Visual Studio 2022 (.NET 6 o superior).
+3. Ajuste usuario/clave de MySQL en Datos/Datos.cs (clase Conexion).
+4. Clic derecho en "Presentacion" > Establecer como proyecto de inicio > F5.
+5. Usuario: admin  Contraseña: 1234
+Pruebas: menú Prueba > Ejecutar todas las pruebas.
