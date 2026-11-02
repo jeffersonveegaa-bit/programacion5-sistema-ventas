@@ -1,0 +1,4 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup><TargetFramework>net8.0</TargetFramework><Nullable>enable</Nullable><ImplicitUsings>disable</ImplicitUsings></PropertyGroup>
+  <ItemGroup><PackageReference Include="MySql.Data" Version="8.0.33" /><ProjectReference Include="..\Entidades\Entidades.csproj" /></ItemGroup>
+</Project>
