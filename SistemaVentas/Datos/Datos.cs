@@ -5,14 +5,20 @@ using MySql.Data.MySqlClient;
 
 namespace Datos
 {
-    /// <summary>Provee conexiones a MySQL.</summary>
+    // Conexión con la base de dados
     public static class Conexion
     {
-        private const string Cadena = "Server=localhost;Database=ventasdb;Uid=root;Pwd=root;";
-        public static MySqlConnection Obtener() => new MySqlConnection(Cadena);
+        public static MySqlConnection Obtener()
+        {
+            var cadena = Environment.GetEnvironmentVariable("VENTAS_CONEXION"); 
+            if (string.IsNullOrWhiteSpace(cadena))
+                throw new InvalidOperationException(
+                    "Falta la variable de entorno VENTAS_CONEXION");
+            return new MySqlConnection(cadena);
+        }
     }
 
-    /// <summary>Contrato genérico de repositorio.</summary>
+    // <summary>Contrato genérico de repositorio.</summary>
     public interface IRepositorio<T, TKey>
     {
         List<T> ObtenerTodos();
