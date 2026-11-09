@@ -11,7 +11,8 @@ using Entidades;
 
 namespace Negocio
 {
-    // Negocio de productos.
+    /// <summary> Negocio de productos /// </summary>
+
     public class ProductoService
     {
         private readonly ProductoDAO _dao = RepositorioFactory.Productos();
@@ -20,7 +21,7 @@ namespace Negocio
             Listar().Where(p => p.Nombre.Contains(texto, StringComparison.OrdinalIgnoreCase)).OrderBy(p => p.Nombre).ToList();
         public List<Producto> BajoStock(int minimo = 5) => Listar().Where(p => p.Stock < minimo).ToList();
 
-        // Valida un producto; lanza ArgumentException si es inválido.
+        /// </summary> Valida un producto; lanza ArgumentException si es inválido </summary>
         public static void Validar(Producto p)
         {
             if (string.IsNullOrWhiteSpace(p.Codigo)) throw new ArgumentException("El código es obligatorio.");
@@ -31,12 +32,12 @@ namespace Negocio
         public void Guardar(Producto p, bool nuevo) { Validar(p); if (nuevo) _dao.Insertar(p); else _dao.Actualizar(p); }
         public void Eliminar(string codigo) => _dao.Eliminar(codigo);
 
-        /// Respaldo del inventario en JSON.
+        /// </summary> Respaldo del inventario en JSON. </summary>
         public void ExportarJson(string ruta) =>
             File.WriteAllText(ruta, JsonSerializer.Serialize(Listar(), new JsonSerializerOptions { WriteIndented = true }));
     }
 
-    // Reglas de negocio de clientes.
+    /// </summary> Reglas de negocio de clientes.</summary>
     public class ClienteService
     {
         private readonly ClienteDAO _dao = RepositorioFactory.Clientes();
@@ -50,15 +51,15 @@ namespace Negocio
         public void Eliminar(int id) => _dao.Eliminar(id);
     }
 
-    // Reglas de negocio de ventas.
+    /// </summary> Reglas de negocio de ventas. </summary>
     public class VentaService
     {
         private readonly VentaDAO _dao = RepositorioFactory.Ventas();
 
-        // Calcula el total de la venta usando LINQ.
+        /// </summary> Calcula el total de la venta usando LINQ. </summary>
         public static decimal CalcularTotal(IEnumerable<DetalleVenta> detalles) => detalles.Sum(d => d.Subtotal);
 
-        // Verifica stock disponible antes de agregar una línea.
+        /// </summary> Verifica stock disponible antes de agregar una línea. </summary> 
         public static void ValidarStock(Producto p, int cantidadSolicitada)
         {
             if (cantidadSolicitada <= 0) throw new ArgumentException("La cantidad debe ser mayor a 0.");
@@ -74,21 +75,21 @@ namespace Negocio
         public List<VentaReporteDTO> Reporte() => _dao.Reporte();
     }
 
-    // Autenticación de usuarios.
+    /// </summary> Autenticación de usuarios. </summary>
     public class AuthService
     {
-        // Convierte una clave a hash SHA-256 en hexadecimal minúscula (64 caracteres).
+        /// </summary> Convierte una clave a hash SHA-256 en hexadecimal minúscula (64 caracteres). </summary>  
         public static string Hash(string clave)
         {
             var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(clave));
             return Convert.ToHexString(bytes).ToLowerInvariant();
         }
 
-        // Valida el usuario comparando el hash de la clave.
+        /// </summary> Valida el usuario comparando el hash de la clave. </summary>
         public bool Login(string u, string c) => RepositorioFactory.Usuarios().Validar(u, Hash(c));
     }
 
-    // Exportación a CSV (abre en Excel).
+    /// </summary> Exportación a CSV (abre en Excel). </summary>
     public static class Exportador
     {
         public static void ACsv<T>(IEnumerable<T> datos, string ruta)

@@ -3,16 +3,16 @@ using System.Collections.Generic;
 
 namespace Entidades
 {
-    //Clase base para entidades con nombre (herencia/polimorfismo)
+    /// </summary>Clase base para entidades con nombre (herencia/polimorfismo)</summary>
     public abstract class EntidadBase
     {
         public string Nombre { get; set; } = "";
 
-        // Descripción corta de la entidad.
+        /// </summary> Descripción corta de la entidad. </summary>
         public abstract string Resumen();
     }
 
-    // Producto del inventario.
+    /// </summary> Producto del inventario. </summary>
     public class Producto : EntidadBase
     {
         public string Codigo { get; set; } = "";
@@ -23,7 +23,7 @@ namespace Entidades
         public override string ToString() => Resumen();
     }
 
-    // Cliente del negocio.
+    /// </summary> Cliente del negocio. </summary>
     public class Cliente : EntidadBase
     {
         public int Id { get; set; }
@@ -33,7 +33,7 @@ namespace Entidades
         public override string ToString() => Nombre;
     }
 
-    // Línea de detalle de una venta.
+    /// </summary> Línea de detalle de una venta. </summary>
     public class DetalleVenta
     {
         public string CodigoProducto { get; set; } = "";
@@ -43,7 +43,8 @@ namespace Entidades
         public decimal Subtotal => Cantidad * Precio;
     }
 
-    // Cabecera de venta.
+    /// </summary> Cabecera de venta. </summary>
+
     public class Venta
     {
         public int Id { get; set; }
@@ -53,7 +54,7 @@ namespace Entidades
         public decimal Total { get; set; }
     }
 
-    // DTO usado para mostrar ventas en reportes.
+    /// </summary> DTO usado para mostrar ventas en reportes. </summary>
     public class VentaReporteDTO
     {
         public int Id { get; set; }

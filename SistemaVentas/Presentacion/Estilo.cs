@@ -3,7 +3,7 @@ using System.Windows.Forms;
 
 namespace Presentacion
 {
-    // Paleta y estilos comunes.
+    /// </summary> Paleta y estilos comunes. </summary>
     public static class Estilo
     {
         public static readonly Color Fondo = Color.FromArgb(246, 248, 250);
