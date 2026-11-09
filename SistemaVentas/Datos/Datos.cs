@@ -5,14 +5,20 @@ using MySql.Data.MySqlClient;
 
 namespace Datos
 {
-    /// <summary>Provee conexiones a MySQL.</summary>
+    /// <sumary> Conexión con la base de datos </sumary>
     public static class Conexion
     {
-        private const string Cadena = "Server=localhost;Database=ventasdb;Uid=root;Pwd=root;";
-        public static MySqlConnection Obtener() => new MySqlConnection(Cadena);
+        public static MySqlConnection Obtener()
+        {
+            var cadenaConexion = Environment.GetEnvironmentVariable("VENTAS_CONEXION"); 
+            if (string.IsNullOrWhiteSpace(cadenaConexion))
+                throw new InvalidOperationException(
+                    "Falta la variable de entorno VENTAS_CONEXION");
+            return new MySqlConnection(cadenaConexion);
+        }
     }
 
-    /// <summary>Contrato genérico de repositorio.</summary>
+    /// <sumary> Contrato genérico de repositorio </sumary>
     public interface IRepositorio<T, TKey>
     {
         List<T> ObtenerTodos();
@@ -21,118 +27,119 @@ namespace Datos
         void Eliminar(TKey id);
     }
 
-    /// <summary>DAO de productos (consultas parametrizadas contra SQL Injection).</summary>
+    /// <summary> DAO de productos (consultas parametrizadas contra SQL Injection) </summary>
     public class ProductoDAO : IRepositorio<Producto, string>
     {
         public List<Producto> ObtenerTodos()
         {
             var lista = new List<Producto>();
-            using var cn = Conexion.Obtener(); cn.Open();
-            using var cmd = new MySqlCommand("SELECT codigo,nombre,descripcion,precio,stock FROM productos", cn);
-            using var r = cmd.ExecuteReader();
-            while (r.Read())
-                lista.Add(new Producto { Codigo = r.GetString(0), Nombre = r.GetString(1), Descripcion = r.IsDBNull(2) ? "" : r.GetString(2), Precio = r.GetDecimal(3), Stock = r.GetInt32(4) });
+            using var conexion = Conexion.Obtener(); conexion.Open();
+            using var comando = new MySqlCommand("SELECT codigo,nombre,descripcion,precio,stock FROM productos", conexion);
+            using var lector = comando.ExecuteReader();
+            while (lector.Read())
+                lista.Add(new Producto { Codigo = lector.GetString(0), Nombre = lector.GetString(1), Descripcion = lector.IsDBNull(2) ? "" : lector.GetString(2), Precio = lector.GetDecimal(3), Stock = lector.GetInt32(4) });
             return lista;
         }
-        public void Insertar(Producto p) => Ejecutar("INSERT INTO productos VALUES (@c,@n,@d,@p,@s)", p);
-        public void Actualizar(Producto p) => Ejecutar("UPDATE productos SET nombre=@n,descripcion=@d,precio=@p,stock=@s WHERE codigo=@c", p);
+
+        public void Insertar(Producto producto) => Ejecutar("INSERT INTO productos VALUES (@c,@n,@d,@p,@s)", producto);
+        public void Actualizar(Producto producto) => Ejecutar("UPDATE productos SET nombre=@n,descripcion=@d,precio=@p,stock=@s WHERE codigo=@c", producto);
         public void Eliminar(string codigo)
         {
-            using var cn = Conexion.Obtener(); cn.Open();
-            using var cmd = new MySqlCommand("DELETE FROM productos WHERE codigo=@c", cn);
-            cmd.Parameters.AddWithValue("@c", codigo); cmd.ExecuteNonQuery();
+            using var conexion = Conexion.Obtener(); conexion.Open();
+            using var comando = new MySqlCommand("DELETE FROM productos WHERE codigo=@c", conexion);
+            comando.Parameters.AddWithValue("@c", codigo); comando.ExecuteNonQuery();
         }
         private static void Ejecutar(string sql, Producto p)
         {
-            using var cn = Conexion.Obtener(); cn.Open();
-            using var cmd = new MySqlCommand(sql, cn);
-            cmd.Parameters.AddWithValue("@c", p.Codigo); cmd.Parameters.AddWithValue("@n", p.Nombre);
-            cmd.Parameters.AddWithValue("@d", p.Descripcion); cmd.Parameters.AddWithValue("@p", p.Precio);
-            cmd.Parameters.AddWithValue("@s", p.Stock); cmd.ExecuteNonQuery();
+            using var conexion = Conexion.Obtener(); conexion.Open();
+            using var comando = new MySqlCommand(sql, conexion);
+            comando.Parameters.AddWithValue("@c", p.Codigo); comando.Parameters.AddWithValue("@n", p.Nombre);
+            comando.Parameters.AddWithValue("@d", p.Descripcion); comando.Parameters.AddWithValue("@p", p.Precio);
+            comando.Parameters.AddWithValue("@s", p.Stock); comando.ExecuteNonQuery();
         }
     }
 
-    /// <summary>DAO de clientes.</summary>
+    /// <summary> DAO de clientes </summary>
     public class ClienteDAO : IRepositorio<Cliente, int>
     {
         public List<Cliente> ObtenerTodos()
         {
             var lista = new List<Cliente>();
-            using var cn = Conexion.Obtener(); cn.Open();
-            using var cmd = new MySqlCommand("SELECT id,nombre,telefono,correo FROM clientes", cn);
-            using var r = cmd.ExecuteReader();
-            while (r.Read())
-                lista.Add(new Cliente { Id = r.GetInt32(0), Nombre = r.GetString(1), Telefono = r.GetString(2), Correo = r.GetString(3) });
+            using var conexion = Conexion.Obtener(); conexion.Open();
+            using var comando = new MySqlCommand("SELECT id,nombre,telefono,correo FROM clientes", conexion);
+            using var lector = comando.ExecuteReader();
+            while (lector.Read())
+                lista.Add(new Cliente { Id = lector.GetInt32(0), Nombre = lector.GetString(1), Telefono = lector.GetString(2), Correo = lector.GetString(3) });
             return lista;
         }
-        public void Insertar(Cliente c) => Ejecutar("INSERT INTO clientes (nombre,telefono,correo) VALUES (@n,@t,@e)", c);
-        public void Actualizar(Cliente c) => Ejecutar("UPDATE clientes SET nombre=@n,telefono=@t,correo=@e WHERE id=@id", c);
+        public void Insertar(Cliente cliente) => Ejecutar("INSERT INTO clientes (nombre,telefono,correo) VALUES (@n,@t,@e)", cliente);
+        public void Actualizar(Cliente cliente) => Ejecutar("UPDATE clientes SET nombre=@n,telefono=@t,correo=@e WHERE id=@id", cliente);
         public void Eliminar(int id)
         {
-            using var cn = Conexion.Obtener(); cn.Open();
-            using var cmd = new MySqlCommand("DELETE FROM clientes WHERE id=@id", cn);
-            cmd.Parameters.AddWithValue("@id", id); cmd.ExecuteNonQuery();
+            using var conexion = Conexion.Obtener(); conexion.Open();
+            using var comando = new MySqlCommand("DELETE FROM clientes WHERE id=@id", conexion);
+            comando.Parameters.AddWithValue("@id", id); comando.ExecuteNonQuery();
         }
-        private static void Ejecutar(string sql, Cliente c)
+        private static void Ejecutar(string sql, Cliente cliente)
         {
-            using var cn = Conexion.Obtener(); cn.Open();
-            using var cmd = new MySqlCommand(sql, cn);
-            cmd.Parameters.AddWithValue("@id", c.Id); cmd.Parameters.AddWithValue("@n", c.Nombre);
-            cmd.Parameters.AddWithValue("@t", c.Telefono); cmd.Parameters.AddWithValue("@e", c.Correo);
-            cmd.ExecuteNonQuery();
+            using var conexion = Conexion.Obtener(); conexion.Open();
+            using var comando = new MySqlCommand(sql, conexion);
+            comando.Parameters.AddWithValue("@id", cliente.Id); comando.Parameters.AddWithValue("@n", cliente.Nombre);
+            comando.Parameters.AddWithValue("@t", cliente.Telefono); comando.Parameters.AddWithValue("@e", cliente.Correo);
+            comando.ExecuteNonQuery();
         }
     }
 
-    /// <summary>DAO de ventas: guarda cabecera, detalle y descuenta stock en una transacción.</summary>
+    /// <summary> DAO de ventas: guarda cabecera, detalle y descuenta stock en una transacción </summary>
     public class VentaDAO
     {
-        public int Registrar(Venta v)
+        public int Registrar(Venta venta)
         {
-            using var cn = Conexion.Obtener(); cn.Open();
-            using var tx = cn.BeginTransaction();
+            using var conexion = Conexion.Obtener(); conexion.Open();
+            using var transaccion = conexion.BeginTransaction();
             try
             {
-                var cab = new MySqlCommand("INSERT INTO ventas (fecha,cliente_id,total) VALUES (@f,@c,@t); SELECT LAST_INSERT_ID();", cn, tx);
-                cab.Parameters.AddWithValue("@f", v.Fecha); cab.Parameters.AddWithValue("@c", v.ClienteId); cab.Parameters.AddWithValue("@t", v.Total);
-                int id = Convert.ToInt32(cab.ExecuteScalar());
-                foreach (var d in v.Detalles)
+                var comandoVenta = new MySqlCommand("INSERT INTO ventas (fecha,cliente_id,total) VALUES (@f,@c,@t); SELECT LAST_INSERT_ID();", conexion, transaccion);
+                comandoVenta.Parameters.AddWithValue("@f", venta.Fecha); comandoVenta.Parameters.AddWithValue("@c", venta.ClienteId); comandoVenta.Parameters.AddWithValue("@t", venta.Total);
+                int ventaID = Convert.ToInt32(comandoVenta.ExecuteScalar());
+                foreach (var detalle in venta.Detalles)
                 {
-                    var det = new MySqlCommand("INSERT INTO detalle_venta (venta_id,producto_codigo,cantidad,precio) VALUES (@v,@p,@c,@pr)", cn, tx);
-                    det.Parameters.AddWithValue("@v", id); det.Parameters.AddWithValue("@p", d.CodigoProducto);
-                    det.Parameters.AddWithValue("@c", d.Cantidad); det.Parameters.AddWithValue("@pr", d.Precio); det.ExecuteNonQuery();
-                    var st = new MySqlCommand("UPDATE productos SET stock = stock - @c WHERE codigo=@p", cn, tx);
-                    st.Parameters.AddWithValue("@c", d.Cantidad); st.Parameters.AddWithValue("@p", d.CodigoProducto); st.ExecuteNonQuery();
+                    var comandoDetalle = new MySqlCommand("INSERT INTO detalle_venta (venta_id,producto_codigo,cantidad,precio) VALUES (@v,@p,@c,@pr)", conexion, transaccion);
+                    comandoDetalle.Parameters.AddWithValue("@v", ventaID); comandoDetalle.Parameters.AddWithValue("@p", detalle.CodigoProducto);
+                    comandoDetalle.Parameters.AddWithValue("@c", detalle.Cantidad); comandoDetalle.Parameters.AddWithValue("@pr", detalle.Precio); comandoDetalle.ExecuteNonQuery();
+                    var comandoStock = new MySqlCommand("UPDATE productos SET stock = stock - @c WHERE codigo=@p", conexion, transaccion);
+                    comandoStock.Parameters.AddWithValue("@c", detalle.Cantidad); comandoStock.Parameters.AddWithValue("@p", detalle.CodigoProducto); comandoStock.ExecuteNonQuery();
                 }
-                tx.Commit();
-                return id;
+                transaccion.Commit();
+                return ventaID;
             }
-            catch { tx.Rollback(); throw; }
+            catch { transaccion.Rollback(); throw; }
         }
 
         public List<VentaReporteDTO> Reporte()
         {
             var lista = new List<VentaReporteDTO>();
-            using var cn = Conexion.Obtener(); cn.Open();
-            using var cmd = new MySqlCommand("SELECT v.id,v.fecha,c.nombre,v.total FROM ventas v JOIN clientes c ON c.id=v.cliente_id ORDER BY v.fecha DESC", cn);
-            using var r = cmd.ExecuteReader();
-            while (r.Read()) lista.Add(new VentaReporteDTO { Id = r.GetInt32(0), Fecha = r.GetDateTime(1), Cliente = r.GetString(2), Total = r.GetDecimal(3) });
+            using var conexion = Conexion.Obtener(); conexion.Open();
+            using var comando = new MySqlCommand("SELECT v.id,v.fecha,c.nombre,v.total FROM ventas v JOIN clientes c ON c.id=v.cliente_id ORDER BY v.fecha DESC", conexion);
+            using var lector = comando.ExecuteReader();
+            while (lector.Read()) lista.Add(new VentaReporteDTO { Id = lector.GetInt32(0), Fecha = lector.GetDateTime(1), Cliente = lector.GetString(2), Total = lector.GetDecimal(3) });
             return lista;
         }
     }
 
-    /// <summary>Valida credenciales de usuario.</summary>
+    /// <summary> Valida credenciales de usuario </summary>
     public class UsuarioDAO
     {
         public bool Validar(string usuario, string clave)
         {
-            using var cn = Conexion.Obtener(); cn.Open();
-            using var cmd = new MySqlCommand("SELECT COUNT(*) FROM usuarios WHERE usuario=@u AND clave=@c", cn);
-            cmd.Parameters.AddWithValue("@u", usuario); cmd.Parameters.AddWithValue("@c", clave);
-            return Convert.ToInt32(cmd.ExecuteScalar()) > 0;
+            using var conexion = Conexion.Obtener(); conexion.Open();
+            using var comando = new MySqlCommand("SELECT COUNT(*) FROM usuarios WHERE usuario=@u AND clave=@c", conexion);
+            comando.Parameters.AddWithValue("@u", usuario); comando.Parameters.AddWithValue("@c", clave);
+            return Convert.ToInt32(comando.ExecuteScalar()) > 0;
         }
     }
 
-    /// <summary>Factory que crea los repositorios.</summary>
+    /// <summary> Factory crea los repositorios </summary>
     public static class RepositorioFactory
     {
         public static ProductoDAO Productos() => new();
