@@ -5,7 +5,7 @@ using MySql.Data.MySqlClient;
 
 namespace Datos
 {
-    // Conexión con la base de dados
+    /// <sumary> Conexión con la base de dados </sumary>
     public static class Conexion
     {
         public static MySqlConnection Obtener()
@@ -18,7 +18,7 @@ namespace Datos
         }
     }
 
-    // Contrato genérico de repositorio
+    /// <sumary> Contrato genérico de repositorio </sumary>
     public interface IRepositorio<T, TKey>
     {
         List<T> ObtenerTodos();
@@ -27,7 +27,7 @@ namespace Datos
         void Eliminar(TKey id);
     }
 
-    // DAO de productos (consultas parametrizadas contra SQL Injection).
+    /// <summary> DAO de productos (consultas parametrizadas contra SQL Injection) </summary>
     public class ProductoDAO : IRepositorio<Producto, string>
     {
         public List<Producto> ObtenerTodos()
@@ -59,7 +59,7 @@ namespace Datos
         }
     }
 
-    // DAO de clientes
+    /// <summary> DAO de clientes </summary>
     public class ClienteDAO : IRepositorio<Cliente, int>
     {
         public List<Cliente> ObtenerTodos()
@@ -90,7 +90,7 @@ namespace Datos
         }
     }
 
-    // DAO de ventas: guarda cabecera, detalle y descuenta stock en una transacción.
+    /// <summary> DAO de ventas: guarda cabecera, detalle y descuenta stock en una transacción </summary>
     public class VentaDAO
     {
         public int Registrar(Venta venta)
@@ -127,7 +127,7 @@ namespace Datos
         }
     }
 
-    // Valida credenciales de usuario
+    /// <summary> Valida credenciales de usuario </summary>
     public class UsuarioDAO
     {
         public bool Validar(string usuario, string clave)
@@ -139,7 +139,7 @@ namespace Datos
         }
     }
 
-    // Factory crea los repositorios.
+    /// <summary> Factory crea los repositorios </summary>
     public static class RepositorioFactory
     {
         public static ProductoDAO Productos() => new();
