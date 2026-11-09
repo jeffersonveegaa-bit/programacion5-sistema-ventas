@@ -5,7 +5,7 @@ using MySql.Data.MySqlClient;
 
 namespace Datos
 {
-    /// <sumary> Conexión con la base de dados </sumary>
+    /// <sumary> Conexión con la base de datos </sumary>
     public static class Conexion
     {
         public static MySqlConnection Obtener()
