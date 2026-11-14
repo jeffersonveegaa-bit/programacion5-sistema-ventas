@@ -22,8 +22,9 @@ namespace Datos
                     var comandoDetalle = new MySqlCommand("INSERT INTO detalle_venta (venta_id,producto_codigo,cantidad,precio) VALUES (@venta_id,@producto_codigo,@cantidad,@precio)", conexion, transaccion);
                     comandoDetalle.Parameters.AddWithValue("@venta_id", ventaID); comandoDetalle.Parameters.AddWithValue("@producto_codigo", detalle.CodigoProducto);
                     comandoDetalle.Parameters.AddWithValue("@cantidad", detalle.Cantidad); comandoDetalle.Parameters.AddWithValue("@precio", detalle.Precio); comandoDetalle.ExecuteNonQuery();
-                    var comandoStock = new MySqlCommand("UPDATE productos SET stock = stock - @cantidad WHERE codigo=@producto_codigo", conexion, transaccion);
-                    comandoStock.Parameters.AddWithValue("@cantidad", detalle.Cantidad); comandoStock.Parameters.AddWithValue("@producto_codigo", detalle.CodigoProducto); comandoStock.ExecuteNonQuery();
+                    var comandoStock = new MySqlCommand("UPDATE productos SET stock = stock - @cantidad WHERE codigo=@producto_codigo AND stock >= @cantidad", conexion, transaccion);
+                    if (comandoStock.ExecuteNonQuery() == 0)
+                        throw new InvalidOperationException("Stock insuficiente para el producto " + detalle.CodigoProducto);
                 }
                 transaccion.Commit();
                 return ventaID;
