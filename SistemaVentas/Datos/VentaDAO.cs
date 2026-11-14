@@ -23,6 +23,7 @@ namespace Datos
                     comandoDetalle.Parameters.AddWithValue("@venta_id", ventaID); comandoDetalle.Parameters.AddWithValue("@producto_codigo", detalle.CodigoProducto);
                     comandoDetalle.Parameters.AddWithValue("@cantidad", detalle.Cantidad); comandoDetalle.Parameters.AddWithValue("@precio", detalle.Precio); comandoDetalle.ExecuteNonQuery();
                     var comandoStock = new MySqlCommand("UPDATE productos SET stock = stock - @cantidad WHERE codigo=@producto_codigo AND stock >= @cantidad", conexion, transaccion);
+                    comandoStock.Parameters.AddWithValue("@cantidad", detalle.Cantidad); comandoStock.Parameters.AddWithValue("@producto_codigo", detalle.CodigoProducto);
                     if (comandoStock.ExecuteNonQuery() == 0)
                         throw new InvalidOperationException("Stock insuficiente para el producto " + detalle.CodigoProducto);
                 }
@@ -41,5 +42,28 @@ namespace Datos
             while (lector.Read()) lista.Add(new VentaReporteDTO { Id = lector.GetInt32(0), Fecha = lector.GetDateTime(1), Cliente = lector.GetString(2), Total = lector.GetDecimal(3) });
             return lista;
         }
+
+
+        public List<DetalleVentaReporteDTO> ObtenerDetalle(int ventaId)
+        {
+            var lista = new List<DetalleVentaReporteDTO>();
+            using var conexion = Conexion.Obtener(); conexion.Open();
+            using var comando = new MySqlCommand(
+                "SELECT d.producto_codigo, p.nombre, d.cantidad, d.precio " +
+                "FROM detalle_venta d JOIN productos p ON p.codigo = d.producto_codigo " +
+                "WHERE d.venta_id = @venta_id", conexion);
+            comando.Parameters.AddWithValue("@venta_id", ventaId);
+            using var lector = comando.ExecuteReader();
+            while (lector.Read())
+                lista.Add(new DetalleVentaReporteDTO
+                {
+                    CodigoProducto = lector.GetString(0),
+                    NombreProducto = lector.GetString(1),
+                    Cantidad = lector.GetInt32(2),
+                    Precio = lector.GetDecimal(3)
+                });
+            return lista;
+        }
+
     }
 }

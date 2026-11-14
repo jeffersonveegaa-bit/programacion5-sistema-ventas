@@ -28,5 +28,6 @@ namespace Negocio
             return _dao.Registrar(v);
         }
         public List<VentaReporteDTO> Reporte() => _dao.Reporte();
+        public List<DetalleVentaReporteDTO> ObtenerDetalle(int ventaId) => _dao.ObtenerDetalle(ventaId);
     }
 }
