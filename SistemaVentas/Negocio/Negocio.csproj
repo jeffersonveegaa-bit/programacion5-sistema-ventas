@@ -1,4 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup><TargetFramework>net8.0</TargetFramework><Nullable>enable</Nullable><ImplicitUsings>disable</ImplicitUsings></PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="QuestPDF" Version="2026.9.2" />
+  </ItemGroup>
   <ItemGroup><ProjectReference Include="..\Datos\Datos.csproj" /><ProjectReference Include="..\Entidades\Entidades.csproj" /></ItemGroup>
 </Project>
