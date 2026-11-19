@@ -1,14 +1,16 @@
 using MigraDoc.DocumentObjectModel;
 using MigraDoc.Rendering;
 using PdfSharp.Fonts;
+using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Negocio
 {
-    /// <summary> Exportación a CSV (abre en Excel) </summary>
     public static class Exportador
     {
 
@@ -17,14 +19,36 @@ namespace Negocio
         {
             GlobalFontSettings.UseWindowsFontsUnderWindows = true;
         }
+
+        /// <summary> Exportación a CSV (abre en Excel) </summary>
         public static void ACsv<T>(IEnumerable<T> datos, string ruta)
         {
-            var props = typeof(T).GetProperties();
-            var sb = new StringBuilder();
-            sb.AppendLine(string.Join(";", props.Select(p => p.Name)));
-            foreach (var d in datos) sb.AppendLine(string.Join(";", props.Select(p => p.GetValue(d)?.ToString())));
-            File.WriteAllText(ruta, sb.ToString(), Encoding.UTF8);
+            var propiedades = typeof(T).GetProperties();
+            string separador = CultureInfo.CurrentCulture.TextInfo.ListSeparator;
+            var contenido = new StringBuilder();
+
+            var encabezados = propiedades.Select(propiedad => EscaparCelda(Regex.Replace(propiedad.Name, "(?<!^)([A-Z])", " $1"), separador));
+            contenido.AppendLine(string.Join(separador, encabezados));
+
+            foreach (var registro in datos)
+            {
+                var valores = propiedades.Select(propiedad => EscaparCelda(FormatearValor(propiedad.GetValue(registro)), separador));
+                contenido.AppendLine(string.Join(separador, valores));
+            }
+
+            File.WriteAllText(ruta, contenido.ToString(), Encoding.UTF8);
         }
+
+        /// <summary> Formato de valores para la exportación a CSV </summary>
+        private static string FormatearValor(object? valor) => valor switch
+        {
+            null => "",
+            DateTime fecha => fecha.ToString("dd/MM/yyyy HH:mm"), decimal monto => monto.ToString("F2"), _ => valor.ToString() ?? ""
+        };
+
+        /// <summary> Formato para los separadores en la exportación a CSV </summary>
+        private static string EscaparCelda(string texto, string separador) =>
+            texto.Contains(separador) || texto.Contains('"') || texto.Contains('\n') ? "\"" + texto.Replace("\"", "\"\"") + "\"" : texto;
 
         /// <summary> Exportación a PDF </summary>
         public static void APdf<T>(IEnumerable<T> datos, string ruta, string titulo)
