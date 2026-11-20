@@ -18,7 +18,7 @@ namespace Presentacion
             cboTipo.Items.AddRange(new object[] { "Ventas", "Productos", "Clientes", "Productos bajo stock" });
             cboTipo.SelectedIndexChanged += (_, _) => Cargar();
             var bExcel = Estilo.Boton("Exportar Excel", false); bExcel.SetBounds(215, 58, 140, 30);
-            bExcel.Click += ExportarCSV;
+            bExcel.Click += ExportarExcel;
             var bPdf = Estilo.Boton("Exportar PDF", false); bPdf.SetBounds(365, 58, 140, 30);
             bPdf.Click += ExportarPdf;
             Controls.AddRange(new Control[] { new Label { Text = "Reportes", Font = Estilo.Titulo, AutoSize = true }, cboTipo, bExcel, bPdf, lblResumen, grid });
@@ -42,19 +42,23 @@ namespace Presentacion
             catch (Exception ex) { MessageBox.Show(ex.Message, "Error"); }
         }
 
-        /// <summary> Método para exportar reporte en CSV </summary>
-        private void ExportarCSV(object? s, EventArgs e)
+        /// <summary> Método para exportar reporte en Excel </summary>
+        private void ExportarExcel(object? s, EventArgs e)
         {
-            using var dlg = new SaveFileDialog { Filter = "CSV (Excel)|*.csv", FileName = $"reporte_{cboTipo.Text}.csv" };
+            using var dlg = new SaveFileDialog { Filter = "Excel|*.xlsx", FileName = $"reporte_{cboTipo.Text}.xlsx" };
             if (dlg.ShowDialog() != DialogResult.OK) return;
-            switch (cboTipo.SelectedIndex)
+            try
             {
-                case 0: Exportador.ACsv(new VentaService().Reporte(), dlg.FileName); break;
-                case 1: Exportador.ACsv(new ProductoService().Listar(), dlg.FileName); break;
-                case 2: Exportador.ACsv(new ClienteService().Listar(), dlg.FileName); break;
-                case 3: Exportador.ACsv(new ProductoService().BajoStock(), dlg.FileName); break;
+                switch (cboTipo.SelectedIndex)
+                {
+                    case 0: Exportador.AExcel(new VentaService().Reporte(), dlg.FileName); break;
+                    case 1: Exportador.AExcel(new ProductoService().Listar(), dlg.FileName); break;
+                    case 2: Exportador.AExcel(new ClienteService().Listar(), dlg.FileName); break;
+                    case 3: Exportador.AExcel(new ProductoService().BajoStock(), dlg.FileName); break;
+                }
+                MessageBox.Show("Reporte exportado.", "Reportes");
             }
-            MessageBox.Show("Reporte exportado.", "Reportes");
+            catch (Exception ex) { MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); }
         }
 
         /// <summary> Método para exportar reporte en PDF </summary>
