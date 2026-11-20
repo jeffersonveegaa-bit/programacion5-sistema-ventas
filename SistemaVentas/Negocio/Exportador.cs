@@ -3,11 +3,8 @@ using MigraDoc.Rendering;
 using PdfSharp.Fonts;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
 using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
+using ClosedXML.Excel;
 
 namespace Negocio
 {
@@ -20,35 +17,30 @@ namespace Negocio
             GlobalFontSettings.UseWindowsFontsUnderWindows = true;
         }
 
-        /// <summary> Exportación a CSV (abre en Excel) </summary>
-        public static void ACsv<T>(IEnumerable<T> datos, string ruta)
+        /// <summary> Exportación a Excel </summary>
+        public static void AExcel<T>(IEnumerable<T> datos, string ruta)
         {
             var propiedades = typeof(T).GetProperties();
-            string separador = CultureInfo.CurrentCulture.TextInfo.ListSeparator;
-            var contenido = new StringBuilder();
+            var registros = datos.ToList();
 
-            var encabezados = propiedades.Select(propiedad => EscaparCelda(Regex.Replace(propiedad.Name, "(?<!^)([A-Z])", " $1"), separador));
-            contenido.AppendLine(string.Join(separador, encabezados));
+            using var libro = new XLWorkbook();
+            var hoja = libro.Worksheets.Add("Reporte");
 
-            foreach (var registro in datos)
+            var tabla = hoja.Cell(1, 1).InsertTable(registros, "Reporte", true);
+            tabla.Theme = XLTableTheme.TableStyleMedium2;
+
+            for (int columna = 0; columna < propiedades.Length; columna++)
             {
-                var valores = propiedades.Select(propiedad => EscaparCelda(FormatearValor(propiedad.GetValue(registro)), separador));
-                contenido.AppendLine(string.Join(separador, valores));
+                var tipo = Nullable.GetUnderlyingType(propiedades[columna].PropertyType) ?? propiedades[columna].PropertyType;
+                var columnaExcel = hoja.Column(columna + 1);
+
+                if (tipo == typeof(DateTime)) columnaExcel.Style.DateFormat.Format = "dd/MM/yyyy HH:mm";
+                else if (tipo == typeof(decimal)) columnaExcel.Style.NumberFormat.Format = "#,##0.00";
             }
 
-            File.WriteAllText(ruta, contenido.ToString(), Encoding.UTF8);
+            hoja.Columns().AdjustToContents();
+            libro.SaveAs(ruta);
         }
-
-        /// <summary> Formato de valores para la exportación a CSV </summary>
-        private static string FormatearValor(object? valor) => valor switch
-        {
-            null => "",
-            DateTime fecha => fecha.ToString("dd/MM/yyyy HH:mm"), decimal monto => monto.ToString("F2"), _ => valor.ToString() ?? ""
-        };
-
-        /// <summary> Formato para los separadores en la exportación a CSV </summary>
-        private static string EscaparCelda(string texto, string separador) =>
-            texto.Contains(separador) || texto.Contains('"') || texto.Contains('\n') ? "\"" + texto.Replace("\"", "\"\"") + "\"" : texto;
 
         /// <summary> Exportación a PDF </summary>
         public static void APdf<T>(IEnumerable<T> datos, string ruta, string titulo)
