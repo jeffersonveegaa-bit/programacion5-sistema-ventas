@@ -68,6 +68,33 @@ namespace Presentacion
             { try { _srv.Eliminar(txtCodigo.Text); Limpiar(); Cargar(); } catch (Exception ex) { MessageBox.Show(ex.Message, "Error"); } }
         }
 
+        private void RespaldarProductos(object? s, EventArgs e)
+        {
+            using var dialogo = new SaveFileDialog { Filter = "JSON|*.json", FileName = "respaldo_productos.json" };
+            if (dialogo.ShowDialog() != DialogResult.OK) return;
+            try
+            {
+                _srv.ExportarJson(dialogo.FileName);
+                MessageBox.Show("Respaldo guardado.", "Productos", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex) { MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); }
+        }
+
+        private void RestaurarProductos(object? s, EventArgs e)
+        {
+            using var dialogo = new OpenFileDialog { Filter = "JSON|*.json" };
+            if (dialogo.ShowDialog() != DialogResult.OK) return;
+            if (MessageBox.Show("Los productos con el mismo código se actualizarán con los datos del archivo. ¿Continuar?", "Restaurar respaldo", MessageBoxButtons.YesNo) != DialogResult.Yes) return;
+            try
+            {
+                int cantidad = _srv.ImportarJson(dialogo.FileName);
+                Cargar();
+                MessageBox.Show($"Se cargaron {cantidad} productos.", "Productos", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (ArgumentException ex) { MessageBox.Show(ex.Message, "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning); }
+            catch (Exception ex) { MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); }
+        }
+
         private void Seleccionar(object? s, DataGridViewCellEventArgs e)
         {
             if (e.RowIndex < 0 || grid.Rows[e.RowIndex].DataBoundItem is not Producto p) return;
