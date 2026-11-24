@@ -27,13 +27,16 @@ namespace Presentacion
             var bGuardar = Estilo.Boton("Guardar"); bGuardar.SetBounds(0, 115, 110, 34);
             var bEliminar = Estilo.Boton("Eliminar", false); bEliminar.SetBounds(120, 115, 110, 34);
             var bLimpiar = Estilo.Boton("Limpiar", false); bLimpiar.SetBounds(240, 115, 110, 34);
+            var bRespaldar = Estilo.Boton("Respaldar JSON", false); bRespaldar.SetBounds(400, 115, 140, 34);
+            var bRestaurar = Estilo.Boton("Restaurar JSON", false); bRestaurar.SetBounds(550, 115, 140, 34);
+            bRespaldar.Click += RespaldarProductos; bRestaurar.Click += RestaurarProductos;
             bGuardar.Click += Guardar; bEliminar.Click += Eliminar; bLimpiar.Click += (_, _) => Limpiar();
             txtBuscar.TextChanged += (_, _) => grid.DataSource = _srv.Buscar(txtBuscar.Text);
             grid.CellClick += Seleccionar;
             Controls.AddRange(new Control[] { titulo,
                 Estilo.Etiqueta("Código", 0, 55), txtCodigo, Estilo.Etiqueta("Nombre", 125, 55), txtNombre,
                 Estilo.Etiqueta("Descripción", 340, 55), txtDesc, Estilo.Etiqueta("Precio", 575, 55), numPrecio,
-                Estilo.Etiqueta("Stock", 700, 55), numStock, bGuardar, bEliminar, bLimpiar, txtBuscar, grid });
+                Estilo.Etiqueta("Stock", 700, 55), numStock, bGuardar, bEliminar, bLimpiar, bRespaldar, bRestaurar, txtBuscar, grid });
             Load += (_, _) => Cargar();
         }
 
@@ -53,6 +56,33 @@ namespace Presentacion
             if (_nuevo) return;
             if (MessageBox.Show("¿Eliminar este producto?", "Confirmar", MessageBoxButtons.YesNo) == DialogResult.Yes)
             { try { _srv.Eliminar(txtCodigo.Text); Limpiar(); Cargar(); } catch (Exception ex) { MessageBox.Show(ex.Message, "Error"); } }
+        }
+
+        private void RespaldarProductos(object? s, EventArgs e)
+        {
+            using var dialogo = new SaveFileDialog { Filter = "JSON|*.json", FileName = "respaldo_productos.json" };
+            if (dialogo.ShowDialog() != DialogResult.OK) return;
+            try
+            {
+                _srv.ExportarJson(dialogo.FileName);
+                MessageBox.Show("Respaldo guardado.", "Productos", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex) { MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); }
+        }
+
+        private void RestaurarProductos(object? s, EventArgs e)
+        {
+            using var dialogo = new OpenFileDialog { Filter = "JSON|*.json" };
+            if (dialogo.ShowDialog() != DialogResult.OK) return;
+            if (MessageBox.Show("Los productos con el mismo código se actualizarán con los datos del archivo. ¿Continuar?", "Restaurar respaldo", MessageBoxButtons.YesNo) != DialogResult.Yes) return;
+            try
+            {
+                int cantidad = _srv.ImportarJson(dialogo.FileName);
+                Cargar();
+                MessageBox.Show($"Se cargaron {cantidad} productos.", "Productos", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (ArgumentException ex) { MessageBox.Show(ex.Message, "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning); }
+            catch (Exception ex) { MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error); }
         }
 
         private void Seleccionar(object? s, DataGridViewCellEventArgs e)

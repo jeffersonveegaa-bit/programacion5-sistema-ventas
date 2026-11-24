@@ -31,5 +31,25 @@ namespace Negocio
         /// <summary> Respaldo del inventario en JSON. </summary>
         public void ExportarJson(string ruta) =>
             File.WriteAllText(ruta, JsonSerializer.Serialize(Listar(), new JsonSerializerOptions { WriteIndented = true }));
+
+        /// <summary> Para convertir el texo en productos,  </summary>
+        public int ImportarJson(string ruta)
+        {
+            List<Producto>? productos;
+            try { productos = JsonSerializer.Deserialize<List<Producto>>(File.ReadAllText(ruta)); }
+            catch (JsonException) { throw new ArgumentException("El archivo no es un respaldo de productos válido."); }
+
+            if (productos == null) throw new ArgumentException("El archivo no contiene productos.");
+
+            foreach (var producto in productos) Validar(producto);
+
+            var codigosExistentes = Listar().Select(existente => existente.Codigo).ToHashSet();
+            foreach (var producto in productos)
+            {
+                if (codigosExistentes.Contains(producto.Codigo)) _dao.Actualizar(producto);
+                else { _dao.Insertar(producto); codigosExistentes.Add(producto.Codigo); }
+            }
+            return productos.Count;
+        }
     }
 }
