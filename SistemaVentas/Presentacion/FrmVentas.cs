@@ -44,7 +44,11 @@ namespace Presentacion
 
         private void Agregar(object? s, EventArgs e)
         {
-            if (cboProducto.SelectedItem is not Producto p) return;
+            if (cboProducto.SelectedItem is not Producto p)
+            {
+                MessageBox.Show("Seleccione un producto.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
             int cant = (int)numCant.Value;
             var existente = _detalle.FirstOrDefault(d => d.CodigoProducto == p.Codigo);
             try
@@ -61,7 +65,12 @@ namespace Presentacion
 
         private void Registrar(object? s, EventArgs e)
         {
-            if (cboCliente.SelectedItem is not Cliente c) return;
+            if (cboCliente.SelectedItem is not Cliente c)
+            {
+                cboProducto.DataSource = new ProductoService().Listar(); /// <summary>Refresca la lista de products</summary>
+                MessageBox.Show("Seleccione un cliente antes de registrar la venta.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
             try
             {
                 int id = new VentaService().Registrar(new Venta { ClienteId = c.Id, Detalles = _detalle.ToList() });
