@@ -42,7 +42,7 @@ namespace Presentacion
             catch (Exception ex) { MessageBox.Show(ex.Message, "Error"); }
         }
 
-        /// <summary> Método para exportar reporte en Excel </summary>
+        /// <summary> Método para exportar el reporte en Excel </summary>
         private void ExportarExcel(object? s, EventArgs e)
         {
             using var dlg = new SaveFileDialog { Filter = "Excel|*.xlsx", FileName = $"reporte_{cboTipo.Text}.xlsx" };
