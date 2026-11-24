@@ -2,7 +2,7 @@
   <PropertyGroup><TargetFramework>net8.0</TargetFramework><Nullable>enable</Nullable><ImplicitUsings>disable</ImplicitUsings></PropertyGroup>
   <ItemGroup>
     <PackageReference Include="ClosedXML" Version="0.105.1" />
-    <PackageReference Include="PDFsharp-MigraDoc" Version="6.2.4" />
+    <PackageReference Include="PDFsharp-MigraDoc" Version="6.5.0" />
   </ItemGroup>
   <ItemGroup><ProjectReference Include="..\Datos\Datos.csproj" /><ProjectReference Include="..\Entidades\Entidades.csproj" /></ItemGroup>
 </Project>
