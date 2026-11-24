@@ -10,24 +10,27 @@ namespace Presentacion
     /// <summary>Registro de ventas (cabecera-detalle).</summary>
     public class FrmVentas : Form
     {
-        private readonly ComboBox cboCliente = new() { Left = 0, Top = 75, Width = 240, DropDownStyle = ComboBoxStyle.DropDownList };
-        private readonly ComboBox cboProducto = new() { Left = 255, Top = 75, Width = 260, DropDownStyle = ComboBoxStyle.DropDownList };
-        private readonly NumericUpDown numCant = new() { Left = 530, Top = 75, Width = 80, Minimum = 1, Maximum = 1000 };
-        private readonly DataGridView grid = new() { Left = 0, Top = 120, Size = new System.Drawing.Size(760, 340) };
-        private readonly Label lblTotal = new() { Left = 0, Top = 475, AutoSize = true, Font = Estilo.Titulo };
+        private readonly ComboBox cboCliente = new() { DropDownStyle = ComboBoxStyle.DropDownList };
+        private readonly ComboBox cboProducto = new() { DropDownStyle = ComboBoxStyle.DropDownList };
+        private readonly NumericUpDown numCant = new() { Minimum = 1, Maximum = 1000 };
+        private readonly DataGridView grid = new();
+        private readonly Label lblTotal = new() { AutoSize = true, Font = Estilo.Titulo };
         private readonly BindingList<DetalleVenta> _detalle = new();
 
         public FrmVentas()
         {
             Estilo.Formulario(this); Estilo.Grid(grid); grid.DataSource = _detalle;
-            var bAgregar = Estilo.Boton("Agregar", false); bAgregar.SetBounds(625, 73, 110, 30);
-            var bQuitar = Estilo.Boton("Quitar línea", false); bQuitar.SetBounds(520, 520, 110, 34);
-            var bRegistrar = Estilo.Boton("Registrar venta"); bRegistrar.SetBounds(640, 520, 140, 34);
+            var bAgregar = Estilo.Boton("Agregar", false);
+            var bQuitar = Estilo.Boton("Quitar línea", false);
+            var bRegistrar = Estilo.Boton("Registrar venta");
             bAgregar.Click += Agregar; bRegistrar.Click += Registrar;
             bQuitar.Click += (_, _) => { if (grid.CurrentRow?.DataBoundItem is DetalleVenta d) { _detalle.Remove(d); ActualizarTotal(); } };
-            Controls.AddRange(new Control[] { new Label { Text = "Nueva venta", Font = Estilo.Titulo, AutoSize = true },
-                Estilo.Etiqueta("Cliente", 0, 55), cboCliente, Estilo.Etiqueta("Producto", 255, 55), cboProducto,
-                Estilo.Etiqueta("Cantidad", 530, 55), numCant, bAgregar, grid, lblTotal, bQuitar, bRegistrar });
+
+            var seleccion = Estilo.Fila(
+                Estilo.Campo("Cliente", cboCliente, 260), Estilo.Campo("Producto", cboProducto, 300),
+                Estilo.Campo("Cantidad", numCant, 90), Estilo.Campo(" ", bAgregar));
+            var barra = Estilo.BarraInferior(lblTotal, bQuitar, bRegistrar);
+            Estilo.Raiz(this, "Nueva venta", grid, seleccion, grid, barra);
             Load += (_, _) => Cargar();
         }
 
