@@ -8,20 +8,24 @@ namespace Presentacion
     /// <summary> Reportes de ventas, productos y clientes con exportación. </summary>
     public class FrmReportes : Form
     {
-        private readonly ComboBox cboTipo = new() { Left = 0, Top = 60, Width = 200, DropDownStyle = ComboBoxStyle.DropDownList };
-        private readonly DataGridView grid = new() { Left = 0, Top = 105, Size = new System.Drawing.Size(900, 400), Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Bottom };
-        private readonly Label lblResumen = new() { Left = 530, Top = 66, AutoSize = true };
+        private readonly ComboBox cboTipo = new() { DropDownStyle = ComboBoxStyle.DropDownList };
+        private readonly DataGridView grid = new();
+        private readonly Label lblResumen = new() { AutoSize = true, Margin = new Padding(0, 6, 0, 0) };
 
         public FrmReportes()
         {
             Estilo.Formulario(this); Estilo.Grid(grid);
             cboTipo.Items.AddRange(new object[] { "Ventas", "Productos", "Clientes", "Productos bajo stock" });
             cboTipo.SelectedIndexChanged += (_, _) => Cargar();
-            var bExcel = Estilo.Boton("Exportar Excel", false); bExcel.SetBounds(215, 58, 140, 30);
+            var bExcel = Estilo.Boton("Exportar Excel", false);
             bExcel.Click += ExportarExcel;
-            var bPdf = Estilo.Boton("Exportar PDF", false); bPdf.SetBounds(365, 58, 140, 30);
+            var bPdf = Estilo.Boton("Exportar PDF", false);
             bPdf.Click += ExportarPdf;
-            Controls.AddRange(new Control[] { new Label { Text = "Reportes", Font = Estilo.Titulo, AutoSize = true }, cboTipo, bExcel, bPdf, lblResumen, grid });
+
+            var barra = Estilo.Fila(
+                Estilo.Campo("Tipo de reporte", cboTipo, 240), Estilo.Campo(" ", bExcel),
+                Estilo.Campo(" ", bPdf), Estilo.Campo("Resumen", lblResumen));
+            Estilo.Raiz(this, "Reportes", grid, barra, grid);
             Load += (_, _) => cboTipo.SelectedIndex = 0;
         }
 

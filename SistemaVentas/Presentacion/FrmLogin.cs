@@ -1,4 +1,5 @@
 using System;
+using System.Drawing;
 using System.Windows.Forms;
 using Negocio;
 
@@ -7,18 +8,51 @@ namespace Presentacion
     /// <summary>Pantalla de inicio de sesión.</summary>
     public class FrmLogin : Form
     {
-        private readonly TextBox txtUsuario = new() { Left = 30, Top = 95, Width = 260 };
-        private readonly TextBox txtClave = new() { Left = 30, Top = 155, Width = 260, UseSystemPasswordChar = true };
+        private readonly TextBox txtUsuario = new();
+        private readonly TextBox txtClave = new() { UseSystemPasswordChar = true };
 
         public FrmLogin()
         {
-            Text = "Iniciar sesión"; ClientSize = new System.Drawing.Size(320, 260);
-            FormBorderStyle = FormBorderStyle.FixedDialog; MaximizeBox = false;
+            Text = "Iniciar sesión";
+            FormBorderStyle = FormBorderStyle.FixedDialog; MaximizeBox = false; MinimizeBox = false;
             Estilo.Formulario(this);
-            var titulo = new Label { Text = "Sistema de Ventas", Font = Estilo.Titulo, Left = 28, Top = 20, AutoSize = true };
-            var btn = Estilo.Boton("Ingresar"); btn.Left = 30; btn.Top = 200; btn.Width = 260;
+            AutoSize = true; AutoSizeMode = AutoSizeMode.GrowAndShrink; Padding = new Padding(32, 28, 32, 18);
+
+            var btn = Estilo.Boton("Ingresar");
+            btn.AutoSize = false; btn.Size = new Size(280, 40); btn.Margin = new Padding(0, 6, 0, 0);
             btn.Click += Ingresar; AcceptButton = btn;
-            Controls.AddRange(new Control[] { titulo, Estilo.Etiqueta("Usuario", 30, 72), txtUsuario, Estilo.Etiqueta("Contraseña", 30, 132), txtClave, btn });
+
+            var panel = new FlowLayoutPanel
+            {
+                FlowDirection = FlowDirection.TopDown,
+                WrapContents = false,
+                AutoSize = true,
+                AutoSizeMode = AutoSizeMode.GrowAndShrink
+            };
+            // Título y subtítulo centrados sobre el ancho de los campos
+            panel.Controls.Add(new Label
+            {
+                Text = "Sistema de Ventas",
+                Font = Estilo.Titulo,
+                AutoSize = false,
+                Size = new Size(280, 40),
+                TextAlign = ContentAlignment.MiddleCenter,
+                Margin = new Padding(0)
+            });
+            panel.Controls.Add(new Label
+            {
+                Text = "Inicie sesión para continuar",
+                ForeColor = Estilo.TextoSuave,
+                AutoSize = false,
+                Size = new Size(280, 26),
+                TextAlign = ContentAlignment.MiddleCenter,
+                Margin = new Padding(0, 0, 0, 18)
+            });
+            panel.Controls.Add(Estilo.Campo("Usuario", txtUsuario, 280));
+            panel.Controls.Add(Estilo.Campo("Contraseña", txtClave, 280));
+            panel.Controls.Add(btn);
+            Controls.Add(panel);
+            Shown += (_, _) => txtUsuario.Focus();
         }
 
         private void Ingresar(object? s, EventArgs e)
