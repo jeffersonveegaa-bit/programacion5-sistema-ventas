@@ -1,6 +1,6 @@
 namespace Entidades
 {
-    // Cliente del negocio.
+    /// <summary> Cliente del negocio. </summary>
     public class Cliente : EntidadBase
     {
         public int Id { get; set; }

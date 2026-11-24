@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Entidades
 {
-    // Cabecera de venta.
+    /// <summary> Cabecera de venta. </summary>
     public class Venta
     {
         public int Id { get; set; }
