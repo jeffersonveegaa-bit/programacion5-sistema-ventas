@@ -6,7 +6,7 @@ using Entidades;
 
 namespace Negocio
 {
-    // Reglas de negocio de clientes.
+    /// <summary> Reglas de negocio de clientes. </summary>
     public class ClienteService
     {
         private readonly ClienteDAO _dao = RepositorioFactory.Clientes();
