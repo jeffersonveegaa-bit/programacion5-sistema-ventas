@@ -8,7 +8,7 @@ using Entidades;
 
 namespace Negocio
 {
-    // Negocio de productos.
+    /// <summary> Negocio de productos. </summary>
     public class ProductoService
     {
         private readonly ProductoDAO _dao = RepositorioFactory.Productos();
@@ -17,7 +17,7 @@ namespace Negocio
             Listar().Where(p => p.Nombre.Contains(texto, StringComparison.OrdinalIgnoreCase)).OrderBy(p => p.Nombre).ToList();
         public List<Producto> BajoStock(int minimo = 5) => Listar().Where(p => p.Stock < minimo).ToList();
 
-        // Valida un producto; lanza ArgumentException si es inválido.
+        /// <summary> Valida un producto; lanza ArgumentException si es inválido. </summary>
         public static void Validar(Producto p)
         {
             if (string.IsNullOrWhiteSpace(p.Codigo)) throw new ArgumentException("El código es obligatorio.");
@@ -28,7 +28,7 @@ namespace Negocio
         public void Guardar(Producto p, bool nuevo) { Validar(p); if (nuevo) _dao.Insertar(p); else _dao.Actualizar(p); }
         public void Eliminar(string codigo) => _dao.Eliminar(codigo);
 
-        /// Respaldo del inventario en JSON.
+        /// <summary> Respaldo del inventario en JSON. </summary>
         public void ExportarJson(string ruta) =>
             File.WriteAllText(ruta, JsonSerializer.Serialize(Listar(), new JsonSerializerOptions { WriteIndented = true }));
     }

@@ -1,6 +1,6 @@
 namespace Entidades
 {
-    // Línea de detalle de una venta.
+    /// <summary> Línea de detalle de una venta. </summary>
     public class DetalleVenta
     {
         public string CodigoProducto { get; set; } = "";

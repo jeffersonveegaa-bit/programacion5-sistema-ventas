@@ -6,15 +6,15 @@ using Entidades;
 
 namespace Negocio
 {
-    // Reglas de negocio de ventas.
+    /// <summary> Reglas de negocio de ventas. </summary>
     public class VentaService
     {
         private readonly VentaDAO _dao = RepositorioFactory.Ventas();
 
-        // Calcula el total de la venta usando LINQ.
+        /// <summary> Calcula el total de la venta usando LINQ. </summary>
         public static decimal CalcularTotal(IEnumerable<DetalleVenta> detalles) => detalles.Sum(d => d.Subtotal);
 
-        // Verifica stock disponible antes de agregar una línea.
+        /// <summary> Verifica stock disponible antes de agregar una línea. </summary>
         public static void ValidarStock(Producto p, int cantidadSolicitada)
         {
             if (cantidadSolicitada <= 0) throw new ArgumentException("La cantidad debe ser mayor a 0.");

@@ -2,7 +2,7 @@ using System;
 
 namespace Entidades
 {
-    // DTO usado para mostrar ventas en reportes.
+    /// <summary> DTO usado para mostrar ventas en reportes. </summary>
     public class VentaReporteDTO
     {
         public int Id { get; set; }
