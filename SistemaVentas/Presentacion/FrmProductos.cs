@@ -36,7 +36,11 @@ namespace Presentacion
                 Estilo.Campo("Código", txtCodigo, 110), Estilo.Campo("Nombre", txtNombre, 220),
                 Estilo.Campo("Descripción", txtDesc, 260), Estilo.Campo("Precio", numPrecio, 130),
                 Estilo.Campo("Stock", numStock, 90));
-            var acciones = Estilo.Fila(bGuardar, bLimpiar);
+            var bRespaldar = Estilo.Boton("Respaldar JSON", false);
+            var bRestaurar = Estilo.Boton("Restaurar JSON", false);
+            bRespaldar.Click += RespaldarProductos;
+            bRestaurar.Click += RestaurarProductos;
+            var acciones = Estilo.Fila(bGuardar, bLimpiar, bRespaldar, bRestaurar);
             var busqueda = Estilo.Fila(txtBuscar);
             var barra = Estilo.BarraInferior(lblConteo, bEliminar);   // Eliminar queda abajo, a la derecha
             Estilo.Raiz(this, "Productos", grid, campos, acciones, busqueda, grid, barra);

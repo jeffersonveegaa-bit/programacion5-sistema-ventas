@@ -28,6 +28,13 @@ namespace Negocio
             return _dao.Registrar(v);
         }
         public List<VentaReporteDTO> Reporte() => _dao.Reporte();
+
+        /// <summary> Gráfico </summary>
+        public List<(DateTime Fecha, decimal Total)> TotalPorDia() => Reporte()
+        .GroupBy(venta => venta.Fecha.Date)
+        .OrderBy(grupo => grupo.Key)
+        .Select(grupo => (grupoKey, grupo.Sum(venta => venta.Total)))
+        .ToList();
         public List<DetalleVentaReporteDTO> ObtenerDetalle(int ventaId) => _dao.ObtenerDetalle(ventaId);
     }
 }

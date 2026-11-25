@@ -21,10 +21,11 @@ namespace Presentacion
             bExcel.Click += ExportarExcel;
             var bPdf = Estilo.Boton("Exportar PDF", false);
             bPdf.Click += ExportarPdf;
-
+            var bGrafico = Estilo.Boton("Gráfico de ventas", false);
+            bGrafico.Click += (_, _) => { using var dashboard = new FrmDashboard(); dashboard.ShowDialog(); };
             var barra = Estilo.Fila(
                 Estilo.Campo("Tipo de reporte", cboTipo, 240), Estilo.Campo(" ", bExcel),
-                Estilo.Campo(" ", bPdf), Estilo.Campo("Resumen", lblResumen));
+                Estilo.Campo(" ", bPdf), Estilo.Campo(" ", bGrafico), Estilo.Campo("Resumen", lblResumen));
             Estilo.Raiz(this, "Reportes", grid, barra, grid);
             Load += (_, _) => cboTipo.SelectedIndex = 0;
         }
