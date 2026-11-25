@@ -29,12 +29,12 @@ namespace Negocio
         }
         public List<VentaReporteDTO> Reporte() => _dao.Reporte();
 
-        /// <summary> Gráfico </summary>
+        /// <summary> Total de ventas agrupado por día, para el gráfico. </summary>
         public List<(DateTime Fecha, decimal Total)> TotalPorDia() => Reporte()
-        .GroupBy(venta => venta.Fecha.Date)
-        .OrderBy(grupo => grupo.Key)
-        .Select(grupo => (grupoKey, grupo.Sum(venta => venta.Total)))
-        .ToList();
+            .GroupBy(venta => venta.Fecha.Date)
+            .OrderBy(grupo => grupo.Key)
+            .Select(grupo => (grupo.Key, grupo.Sum(venta => venta.Total)))
+            .ToList();
         public List<DetalleVentaReporteDTO> ObtenerDetalle(int ventaId) => _dao.ObtenerDetalle(ventaId);
     }
 }

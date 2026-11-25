@@ -16,20 +16,22 @@ namespace Presentacion
             Text = "Iniciar sesión";
             FormBorderStyle = FormBorderStyle.FixedDialog; MaximizeBox = false; MinimizeBox = false;
             Estilo.Formulario(this);
-            AutoSize = true; AutoSizeMode = AutoSizeMode.GrowAndShrink; Padding = new Padding(32, 28, 32, 18);
+            AutoSize = true; AutoSizeMode = AutoSizeMode.GrowAndShrink; Padding = new Padding(32, 28, 32, 24);
 
             var btn = Estilo.Boton("Ingresar");
             btn.AutoSize = false; btn.Size = new Size(280, 40); btn.Margin = new Padding(0, 6, 0, 0);
             btn.Click += Ingresar; AcceptButton = btn;
 
+            /// <summary>Dock = Fill hace que el Padding del formulario sea el margen real a los cuatro lados</summary>
             var panel = new FlowLayoutPanel
             {
+                Dock = DockStyle.Fill,
                 FlowDirection = FlowDirection.TopDown,
                 WrapContents = false,
                 AutoSize = true,
                 AutoSizeMode = AutoSizeMode.GrowAndShrink
             };
-            // Título y subtítulo centrados sobre el ancho de los campos
+            /// <summary>Título y subtítulo centrados sobre el ancho de los campos</summary>
             panel.Controls.Add(new Label
             {
                 Text = "Sistema de Ventas",

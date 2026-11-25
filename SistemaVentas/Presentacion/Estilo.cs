@@ -49,7 +49,7 @@ namespace Presentacion
             ["Cliente"] = 150,
         };
 
-        /// <summary> Configura un formulario: colores, fuente y escalado automático </summary>
+        /// <summary> Configura un formulario: colores, fuente y escalado de la pantalla </summary>
         public static void Formulario(Form f)
         {
             f.AutoScaleDimensions = new SizeF(96F, 96F);
@@ -112,7 +112,7 @@ namespace Presentacion
 
         private static void FormatearColumnas(DataGridView g)
         {
-            // El nombre va justo después del código o del número
+            /// <summary> El nombre va justo después del código o del número </summary>
             if (g.Columns.Contains("Nombre") && (g.Columns.Contains("Codigo") || g.Columns.Contains("Id")))
                 g.Columns["Nombre"]!.DisplayIndex = 1;
 
@@ -150,8 +150,7 @@ namespace Presentacion
                 AutoSizeMode = AutoSizeMode.GrowAndShrink,
                 Margin = new Padding(0, 0, 14, 10)
             };
-            // Margen izquierdo negativo: compensa el espacio interno del texto para que alinee con el borde del control
-            panel.Controls.Add(new Label { Text = etiqueta, AutoSize = true, ForeColor = TextoSuave, Margin = new Padding(-3, 0, 0, 0) });
+            panel.Controls.Add(new EtiquetaPlana { Text = etiqueta, AutoSize = true, ForeColor = TextoSuave, Margin = new Padding(0) });
             panel.Controls.Add(control);
             return panel;
         }
@@ -217,7 +216,7 @@ namespace Presentacion
             };
             tabla.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
             tabla.RowStyles.Add(new RowStyle(SizeType.AutoSize));
-            tabla.Controls.Add(new Label { Text = titulo, Font = Titulo, AutoSize = true, Margin = new Padding(-5, 0, 0, 12) }, 0, 0);
+            tabla.Controls.Add(new EtiquetaPlana { Text = titulo, Font = Titulo, AutoSize = true, Margin = new Padding(0, 0, 0, 12) }, 0, 0);
             for (int i = 0; i < filas.Length; i++)
             {
                 tabla.RowStyles.Add(filas[i] == expandir ? new RowStyle(SizeType.Percent, 100F) : new RowStyle(SizeType.AutoSize));
@@ -226,6 +225,19 @@ namespace Presentacion
             }
             f.Controls.Add(tabla);
             return tabla;
+        }
+    }
+
+    /// <summary>
+    /// Etiqueta que dibuja su texto sin el espacio interno que WinForms agrega a la izquierda,
+    /// para que quede alineada exactamente con el borde de los campos y botones.
+    /// </summary>
+    internal sealed class EtiquetaPlana : Label
+    {
+        protected override void OnPaint(PaintEventArgs e)
+        {
+            TextRenderer.DrawText(e.Graphics, Text, Font, ClientRectangle, ForeColor,
+                TextFormatFlags.Left | TextFormatFlags.VerticalCenter | TextFormatFlags.NoPadding);
         }
     }
 }
