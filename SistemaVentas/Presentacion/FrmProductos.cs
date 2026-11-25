@@ -68,8 +68,13 @@ namespace Presentacion
         private void Eliminar(object? s, EventArgs e)
         {
             if (_nuevo) return;
-            if (MessageBox.Show("¿Eliminar este producto?", "Confirmar", MessageBoxButtons.YesNo) == DialogResult.Yes)
-            { try { _srv.Eliminar(txtCodigo.Text); Limpiar(); Cargar(); } catch (Exception ex) { MessageBox.Show(ex.Message, "Error"); } }
+            if (MessageBox.Show("¿Eliminar este producto?", "Confirmar", MessageBoxButtons.YesNo) != DialogResult.Yes) return;
+            try { _srv.Eliminar(txtCodigo.Text); Limpiar(); Cargar(); }
+            catch (Exception ex)
+            {
+                MessageBox.Show("No se pudo eliminar el producto. Verifique que no tenga ventas registradas.\n\nDetalle: " + ex.Message,
+                    "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void RespaldarProductos(object? s, EventArgs e)
