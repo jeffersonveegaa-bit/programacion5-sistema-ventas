@@ -1,7 +1,9 @@
+using Entidades;
+using Microsoft.VisualBasic;
+using Negocio;
 using System;
 using System.Linq;
 using System.Windows.Forms;
-using Negocio;
 
 namespace Presentacion
 {
@@ -15,19 +17,33 @@ namespace Presentacion
         public FrmReportes()
         {
             Estilo.Formulario(this); Estilo.Grid(grid);
-            cboTipo.Items.AddRange(new object[] { "Ventas", "Productos", "Clientes", "Productos bajo stock" });
+            grid.CellClick += MostrarDetalleVenta;
+            cboTipo.Items.AddRange(new object[] { "Ventas", "Productos", "Clientes", "Productos bajo stock", "Detalle de venta" });
             cboTipo.SelectedIndexChanged += (_, _) => Cargar();
             var bExcel = Estilo.Boton("Exportar Excel", false);
             bExcel.Click += ExportarExcel;
             var bPdf = Estilo.Boton("Exportar PDF", false);
             bPdf.Click += ExportarPdf;
             var bGrafico = Estilo.Boton("Gráfico de ventas", false);
+            var bVolver = Estilo.Boton("Volver a ventas", false);
+            bVolver.Click += (_, _) =>
+            {
+                cboTipo.SelectedIndex = 0;
+                Cargar();
+            };
             bGrafico.Click += (_, _) => { using var dashboard = new FrmDashboard(); dashboard.ShowDialog(); };
             var barra = Estilo.Fila(
-                Estilo.Campo("Tipo de reporte", cboTipo, 240), Estilo.Campo(" ", bExcel),
-                Estilo.Campo(" ", bPdf), Estilo.Campo(" ", bGrafico), Estilo.Campo("Resumen", lblResumen));
+                Estilo.Campo("Tipo de reporte", cboTipo, 240),
+                Estilo.Campo(" ", bExcel),
+                Estilo.Campo(" ", bPdf),
+                Estilo.Campo(" ", bGrafico),
+                Estilo.Campo(" ", bVolver),
+                Estilo.Campo("Resumen", lblResumen));
             Estilo.Raiz(this, "Reportes", grid, barra, grid);
             Load += (_, _) => cboTipo.SelectedIndex = 0;
+
+
+
         }
 
         private void Cargar()
@@ -42,9 +58,47 @@ namespace Presentacion
                     case 1: grid.DataSource = new ProductoService().Listar(); lblResumen.Text = ""; break;
                     case 2: grid.DataSource = new ClienteService().Listar(); lblResumen.Text = ""; break;
                     case 3: grid.DataSource = new ProductoService().BajoStock(); lblResumen.Text = ""; break;
+                    case 4:
+
+                        string texto = Interaction.InputBox(
+                            "Digite el ID de la venta",
+                            "Detalle de venta",
+                            "1");
+
+                        if (int.TryParse(texto, out int ventaId))
+                        {
+                            var detalle = new VentaService().ObtenerDetalle(ventaId);
+
+                            grid.DataSource = detalle;
+
+                            lblResumen.Text =
+                                $"{detalle.Count} líneas de detalle";
+                        }
+
+                        break;
                 }
             }
             catch (Exception ex) { MessageBox.Show(ex.Message, "Error"); }
+        }
+
+
+        /// metodo para cargar detalles en el clic de ventas
+        private void MostrarDetalleVenta(object? sender, DataGridViewCellEventArgs e)
+        {
+            if (cboTipo.SelectedIndex != 0)
+                return;
+
+            if (e.RowIndex < 0)
+                return;
+
+            if (grid.Rows[e.RowIndex].DataBoundItem is not VentaReporteDTO venta)
+                return;
+
+            var detalle = new VentaService().ObtenerDetalle(venta.Id);
+
+            grid.DataSource = detalle;
+
+            lblResumen.Text = $"Detalle de la venta #{venta.Id}";
         }
 
         /// <summary> Método para exportar el reporte en Excel </summary>

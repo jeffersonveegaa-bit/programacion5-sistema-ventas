@@ -62,10 +62,21 @@ namespace Presentacion
             if (_id <= 0) return;
             if (MessageBox.Show("¿Eliminar cliente?", "Confirmar", MessageBoxButtons.YesNo) != DialogResult.Yes) return;
             try { _srv.Eliminar(_id); Limpiar(); Cargar(); }
+            catch (InvalidOperationException ex)
+            {
+                MessageBox.Show(
+                    ex.Message,
+                    "Operación no permitida",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+            }
             catch (Exception ex)
             {
-                MessageBox.Show("No se pudo eliminar el cliente. Verifique que no tenga ventas registradas.\n\nDetalle: " + ex.Message,
-                    "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(
+                    ex.Message,
+                    "Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
             }
         }
 

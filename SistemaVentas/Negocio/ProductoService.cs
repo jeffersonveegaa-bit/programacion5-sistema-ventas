@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text.Json;
 using Datos;
 using Entidades;
+using MySql.Data.MySqlClient;
 
 namespace Negocio
 {
@@ -26,7 +27,24 @@ namespace Negocio
             if (p.Stock < 0) throw new ArgumentException("El stock no puede ser negativo.");
         }
         public void Guardar(Producto p, bool nuevo) { Validar(p); if (nuevo) _dao.Insertar(p); else _dao.Actualizar(p); }
-        public void Eliminar(string codigo) => _dao.Eliminar(codigo);
+        //public void Eliminar(string codigo) => _dao.Eliminar(codigo);
+        public void Eliminar(string codigo)
+        {
+            try
+            {
+                _dao.Eliminar(codigo);
+            }
+            catch (MySqlException ex)
+            {
+                if (ex.Number == 1451)
+                {
+                    throw new InvalidOperationException(
+                        "No se puede eliminar el producto porque está asociado a una o más ventas.");
+                }
+
+                throw;
+            }
+        }
 
         /// <summary> Respaldo del inventario en JSON. </summary>
         public void ExportarJson(string ruta) =>

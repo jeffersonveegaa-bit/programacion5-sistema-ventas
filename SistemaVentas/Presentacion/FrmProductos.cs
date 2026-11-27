@@ -70,10 +70,21 @@ namespace Presentacion
             if (_nuevo) return;
             if (MessageBox.Show("¿Eliminar este producto?", "Confirmar", MessageBoxButtons.YesNo) != DialogResult.Yes) return;
             try { _srv.Eliminar(txtCodigo.Text); Limpiar(); Cargar(); }
+            catch (InvalidOperationException ex)
+            {
+                MessageBox.Show(
+                    ex.Message,
+                    "Operación no permitida",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
+            }
             catch (Exception ex)
             {
-                MessageBox.Show("No se pudo eliminar el producto. Verifique que no tenga ventas registradas.\n\nDetalle: " + ex.Message,
-                    "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(
+                    ex.Message,
+                    "Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
             }
         }
 
