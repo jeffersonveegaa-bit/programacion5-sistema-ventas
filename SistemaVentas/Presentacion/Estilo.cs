@@ -79,7 +79,7 @@ namespace Presentacion
             return b;
         }
 
-        /// <summary> Botón de acción destructiva (eliminar): texto y borde en rojo </summary>
+        /// <summary> Botón de acción eliminar: texto y borde en rojo </summary>
         public static Button BotonPeligro(string texto)
         {
             var rojo = Color.FromArgb(185, 28, 28);

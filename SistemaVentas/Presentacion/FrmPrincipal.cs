@@ -29,6 +29,15 @@ namespace Presentacion
             Agregar(menu, "Clientes", () => new FrmClientes());
             Agregar(menu, "Nueva venta", () => new FrmVentas());
             Agregar(menu, "Reportes", () => new FrmReportes());
+            // boton para salir del programa.
+            var bSalir = Estilo.BotonPeligro("Salir del sistema");
+            bSalir.BackColor = Color.FromArgb(185, 28, 28);
+            bSalir.ForeColor = Color.White;
+            bSalir.AutoSize = false; bSalir.Size = new Size(190, 40); bSalir.Margin = new Padding(0, 20, 0, 0);
+            bSalir.TextAlign = ContentAlignment.MiddleLeft;
+            bSalir.Click += (_, _) => Close();
+            menu.Controls.Add(bSalir);
+
             Controls.Add(contenido); Controls.Add(menu);
             Marcar(_botones[0]);
             Abrir(new FrmProductos());
