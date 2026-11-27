@@ -5,7 +5,7 @@ namespace Entidades
     {
         public string Nombre { get; set; } = "";
 
-        /// <summary> Obtiene una descripción corta de la entidad. </summary>
+        /// <summary> Método para obtener una descripción corta de la entidad. </summary>
         public abstract string Resumen();
     }
 }

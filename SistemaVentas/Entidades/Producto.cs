@@ -1,6 +1,6 @@
 namespace Entidades
 {
-    /// <summary> Producto del inventario. </summary>
+    /// <summary> Producto del inventario que hereda de EntidadBase. </summary>
     public class Producto : EntidadBase
     {
         public string Codigo { get; set; } = "";
