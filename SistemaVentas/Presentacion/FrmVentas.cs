@@ -1,27 +1,33 @@
-using System;
-using System.ComponentModel;
-using System.Linq;
-using System.Windows.Forms;
-using Entidades;
-using Negocio;
+using System; //trae las herramientas basicas de c#
+using System.ComponentModel;// lista que avisa a la tabla cuabdo ingresa un dato
+using System.Linq; // permite sumar  y buscar dentro de las listas
+using System.Windows.Forms; // es la que trae las herramientas visuales (ventanas, botones...)
+using Entidades; //es la que trae las clases de modelos (producto , cliente, etc)
+using Negocio; // trae las servicios que tiene reglas de negocios
 
 namespace Presentacion
 {
     /// <summary>Registro de ventas (cabecera-detalle).</summary>
     public class FrmVentas : Form
     {
+        // listas desplegables para elegir al cliente.      .dropDownlist (solo puede elegir, no escribir)
         private readonly ComboBox cboCliente = new() { DropDownStyle = ComboBoxStyle.DropDownList };
         private readonly ComboBox cboProducto = new() { DropDownStyle = ComboBoxStyle.DropDownList };
+        //cuadro numerico para la cantidad con un maximo de mil unidades
         private readonly NumericUpDown numCant = new() { Minimum = 1, Maximum = 1000 };
+        //tabla donde se muestrael total de la ventas
         private readonly DataGridView grid = new();
+        //Muestra el total de la venta con letra grande
         private readonly Label lblTotal = new() { AutoSize = true, Font = Estilo.Titulo };
+        // lista de lineas con producto, cantidad, precio, la tabla se llena con con ellas
         private readonly BindingList<DetalleVenta> _detalle = new();
 
+        //constructor, ejecuta y abre la patalla para usarla
         public FrmVentas()
         {
             Estilo.Formulario(this); Estilo.Grid(grid); grid.DataSource = _detalle;
             var bAgregar = Estilo.Boton("Agregar", false);
-            var bQuitar = Estilo.Boton("Quitar línea", false);
+            var bQuitar = Estilo.BotonPeligro("Quitar línea");
             var bRegistrar = Estilo.Boton("Registrar venta");
             bAgregar.Click += Agregar; bRegistrar.Click += Registrar;
             bQuitar.Click += (_, _) => { if (grid.CurrentRow?.DataBoundItem is DetalleVenta d) { _detalle.Remove(d); ActualizarTotal(); } };
